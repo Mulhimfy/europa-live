@@ -18,7 +18,14 @@ if (workers > 1 && cluster.isPrimary) {
   configureCache({ maxEntries: config.cache.maxEntries });
   const { handle } = await import('./app.js');
   const server = http.createServer({ keepAliveTimeout: 65_000, headersTimeout: 70_000, requestTimeout: 120_000, maxHeaderSize: 16 * 1024 }, (req, res) => { handle(req, res); });
-  server.listen(config.port, config.host, () => log.info({ port: config.port, host: config.host, env: config.env, pid: process.pid, node: process.version }, 'europa live listening'));
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\nPort ${config.port} is already in use by another program.\nStart Europa Live on a free port instead, e.g.:\n\n    PORT=3000 npm start\n`);
+      process.exit(1);
+    }
+    log.fatal({ err }, 'server error'); process.exit(1);
+  });
+  server.listen(config.port, config.host, () => log.info({ port: config.port, host: config.host, env: config.env, pid: process.pid, node: process.version, url: `http://localhost:${config.port}` }, 'europa live listening'));
 
   // Warm the slow, shared caches so the first click is as fast as the hundredth.
   import('./providers/satellite.js').then((m) => { m.eumetsatLatest().catch(() => {}); m.gibsLatest().catch(() => {}); });
