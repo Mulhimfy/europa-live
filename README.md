@@ -18,6 +18,12 @@ On the map itself you can switch on live layers: **Clouds** (Meteosat, 10-minute
 
 Every panel section shows how fresh its data is and how long the fetch took. Deep links (`/#@41.8902,12.4922,12z`) reopen the same view.
 
+## Screenshots
+
+| Rome at night: Meteosat GeoColour loop, city lights | Helsinki: 80 live traffic cameras | London: TfL JamCams with live video |
+|---|---|---|
+| ![Rome](docs/rome.png) | ![Helsinki](docs/helsinki.png) | ![London](docs/london.png) |
+
 ## Run it
 
 ```bash

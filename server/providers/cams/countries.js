@@ -49,7 +49,7 @@ export const tfl = {
       if (p.available?.value !== 'true') return null;
       return {
         id: 'tfl:' + c.id, title: `${c.commonName}${p.view?.value ? ` · ${p.view.value}` : ''}`, lat: c.lat, lon: c.lon,
-        image: p.imageUrl?.value, video: p.videoUrl?.value || null, page: 'https://www.tfljamcams.net/', updated: p.imageUrl?.modified || p.available?.modified,
+        image: p.imageUrl?.value, video: p.videoUrl?.value || null, page: 'https://www.tfljamcams.net/',
         live: !!p.videoUrl?.value, source: 'Transport for London', kind: 'traffic', refreshSec: 300,
       };
     }).filter(Boolean);
