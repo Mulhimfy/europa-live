@@ -30,6 +30,13 @@ test('security headers on every response', async () => {
   assert.ok(r.headers.get('x-request-id'));
   assert.match(r.headers.get('content-type'), /text\/html/);
 });
+test('plain http does not force https subresources, and a spoofed proxy header is ignored', async () => {
+  const r = await get('/');
+  assert.doesNotMatch(r.headers.get('content-security-policy'), /upgrade-insecure-requests/);
+  assert.equal(r.headers.get('strict-transport-security'), null);
+  const spoofed = await get('/', { 'x-forwarded-proto': 'https' });
+  assert.doesNotMatch(spoofed.headers.get('content-security-policy'), /upgrade-insecure-requests/);
+});
 test('static assets: etag + 304, brotli/gzip negotiation, immutable vendor caching, no traversal', async () => {
   const r = await get('/app.js', { 'accept-encoding': 'br' });
   assert.equal(r.status, 200);

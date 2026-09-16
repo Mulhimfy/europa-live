@@ -44,11 +44,15 @@ const CSP = [
   "img-src 'self' data: blob: https:", "media-src 'self' blob: https:",
   `connect-src 'self' ${TILE_HOSTS.join(' ')}`,
   "frame-src https://webcams.windy.com https://www.youtube-nocookie.com https://www.youtube.com https://embed.windy.com",
-  'upgrade-insecure-requests',
 ].join('; ');
+// upgrade-insecure-requests would rewrite the page's own http://host:port/app.js to https and break
+// plain-http deployments (http://IP:port, LAN, SSH tunnels), so it is only sent over https.
+const CSP_HTTPS = CSP + '; upgrade-insecure-requests';
+const isHttps = (req) => !!req.socket.encrypted || (config.trustProxy && String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase() === 'https');
 
-function securityHeaders(res) {
-  res.setHeader('content-security-policy', CSP);
+function securityHeaders(req, res) {
+  const https = isHttps(req);
+  res.setHeader('content-security-policy', https ? CSP_HTTPS : CSP);
   res.setHeader('x-content-type-options', 'nosniff');
   res.setHeader('x-frame-options', 'DENY');
   res.setHeader('referrer-policy', 'strict-origin-when-cross-origin');
@@ -56,7 +60,7 @@ function securityHeaders(res) {
   res.setHeader('cross-origin-opener-policy', 'same-origin');
   res.setHeader('cross-origin-resource-policy', 'same-origin');
   res.setHeader('x-dns-prefetch-control', 'off');
-  if (config.publicUrl.startsWith('https://')) res.setHeader('strict-transport-security', 'max-age=31536000; includeSubDomains');
+  if (https) res.setHeader('strict-transport-security', 'max-age=31536000; includeSubDomains');
 }
 
 function clientIp(req) {
@@ -174,7 +178,7 @@ export async function handle(req, res) {
   const t0 = process.hrtime.bigint();
   res.requestId = randomUUID().slice(0, 8);
   res.setHeader('x-request-id', res.requestId);
-  securityHeaders(res);
+  securityHeaders(req, res);
   let url;
   try { url = new URL(req.url, 'http://localhost'); } catch { return bad(req, res, 'bad url'); }
   const path = url.pathname;

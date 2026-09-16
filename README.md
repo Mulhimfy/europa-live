@@ -63,7 +63,7 @@ browser ── SSE /api/live?lat&lon ──► app.js (router, security headers,
 ## Security
 
 * Zero third-party runtime packages: nothing to audit in `node_modules`.
-* Strict Content-Security-Policy (no inline scripts, allow-listed tile hosts, no framing), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP, HSTS when served over https.
+* Strict Content-Security-Policy (no inline scripts, allow-listed tile hosts, no framing), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP. HSTS and `upgrade-insecure-requests` are sent only when the request is https (directly, or via a proxy with `TRUST_PROXY=true`), so plain-http deployments keep working.
 * Input validation on every endpoint; coordinates outside Europe are rejected; only GET/HEAD are accepted.
 * Sliding-window rate limits per client IP (separate budget for image bytes).
 * The image proxy (`/img`, `/cam`) only fetches an explicit host allow-list derived from the camera sources, refuses credentials in URLs, follows redirects only to allow-listed hosts, caps bytes, sniffs content and relays image/video only. No user input ever forms an upstream hostname.
