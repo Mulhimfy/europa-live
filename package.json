@@ -1,0 +1,20 @@
+{
+  "name": "europa-live",
+  "version": "1.0.0",
+  "description": "Europa Live — click anywhere in Europe and see it right now: live webcams and traffic CCTV, live satellite, live rain radar and lightning, live aircraft and ships overhead, live conditions on the ground.",
+  "type": "module",
+  "main": "server/index.js",
+  "engines": { "node": ">=20.10" },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "NODE_ENV=development node --watch server/index.js",
+    "build:data": "node scripts/build-data.js",
+    "test": "node --test",
+    "lint": "node scripts/lint.js",
+    "smoke": "node scripts/smoke.js",
+    "screenshot": "node scripts/screenshot.js"
+  },
+  "dependencies": {},
+  "license": "MIT",
+  "private": true
+}
